@@ -1,5 +1,5 @@
 Name: text-lips
-Version: 0.1
+Version: 0.1.0.1
 Category: Text, Parsing
 Stability: experimental
 Synopsis: Monadic parsing combinator library with attention to locations
