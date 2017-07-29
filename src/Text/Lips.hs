@@ -340,7 +340,7 @@ class CharParsing p ⇒ LocParsing p where
   type ParserLoc p
   -- | The current location.
   location ∷ p (ParserLoc p)
-  default location ∷ (MonadTrans t, Monad p) ⇒ t p (ParserLoc p)
+  default location ∷ (MonadTrans t, Monad m, LocParsing m, p ~ t m, ParserLoc p ~ ParserLoc m) ⇒ p (ParserLoc p)
   location = lift location
   -- | Attach the starting location to the parsed value.
   located  ∷ p α → p (Located (ParserLoc p) α)
@@ -352,7 +352,7 @@ class LocParsing p ⇒ ResetLineParsing p where
   -- | Reset the current line number and return the text lines fully consumed
   --   by the parser so far.
   resetLineNr ∷ Word → p (Seq Text)
-  default resetLineNr ∷ (MonadTrans t, Monad p) ⇒ Word → t p (Seq Text)
+  default resetLineNr ∷ (MonadTrans t, Monad m, ResetLineParsing m, p ~ t m) ⇒ Word → p (Seq Text)
   resetLineNr = lift . resetLineNr
 
 instance LocParsing Parser where
