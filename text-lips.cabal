@@ -1,5 +1,5 @@
 Name: text-lips
-Version: 0.1.0.1
+Version: 0.1.0.2
 Category: Text, Parsing
 Stability: experimental
 Synopsis: Monadic parsing combinator library with attention to locations
@@ -19,9 +19,10 @@ Extra-Source-Files:
   README.md
 
 Tested-With: GHC==7.6.3, GHC==7.8.4, GHC==7.10.3, GHC==8.0.2, GHC==8.2.2,
-             GHC==8.4.4, GHC==8.6.1
+             GHC==8.4.4, GHC==8.6.5, GHC==8.8.4, GHC==8.10.7, GHC==9.0.2,
+             GHC==9.2.4, GHC==9.4.2
 
-Cabal-Version: >= 1.6.0
+Cabal-Version: >= 1.10.0
 Build-Type: Simple
 
 Source-Repository head
@@ -29,9 +30,10 @@ Source-Repository head
   Location: https://github.com/mvv/text-lips.git
 
 Library
+  Default-Language: Haskell2010
   Build-Depends: base >= 4 && < 5
                , text >= 0.10
-               , text-loc >= 0.1
+               , text-loc >= 0.1.1
                , containers >= 0.5
                , parsers >= 0.5
                , transformers >= 0.3

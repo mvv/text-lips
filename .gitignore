@@ -1,4 +1,4 @@
 cabal.sandbox.config
-dist
+/dist*
 .*
 *~

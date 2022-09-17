@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE UnicodeSyntax #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE BangPatterns #-}
@@ -5,6 +6,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE DefaultSignatures #-}
 
 -- | Monadic parsing combinator library with attention to locations.
@@ -22,8 +24,10 @@ module Text.Lips
   ) where
 
 import Data.Typeable (Typeable)
+#if !MIN_VERSION_base(4,8,0)
 import Data.Monoid (Monoid(..))
 import Data.Word (Word)
+#endif
 import Data.String (IsString(..))
 import Data.Text (Text)
 import qualified Data.Text as T
@@ -35,6 +39,9 @@ import Text.Parser.Combinators (Parsing(..))
 import Text.Parser.Char (CharParsing(..))
 import Control.Applicative
 import Control.Monad (MonadPlus(..))
+#if MIN_VERSION_base(4,9,0) && !MIN_VERSION_base(4,13,0)
+import Control.Monad.Fail (MonadFail(..))
+#endif
 import Control.Monad.Trans.Class (MonadTrans(..))
 import Control.Monad.Trans.Identity (IdentityT(..))
 import Control.Monad.Trans.Reader (ReaderT(..))
@@ -227,9 +234,18 @@ instance Monad Parser where
   Parser p >>= f = Parser $ \c cc h ch →
     p (\a → runParser (f a) c cc h ch) (\a → runParser (f a) cc cc ch ch) h ch
   {-# INLINE (>>=) #-}
+#if !MIN_VERSION_base(4,13,0)
   fail msg = Parser $ \_ _ h _ ctx pl nl →
                h (Error nl ctx msg) ctx pl nl
   {-# INLINE fail #-}
+#endif
+
+#if MIN_VERSION_base(4,9,0)
+instance MonadFail Parser where
+  fail msg = Parser $ \_ _ h _ ctx pl nl →
+               h (Error nl ctx msg) ctx pl nl
+  {-# INLINE fail #-}
+#endif
 
 instance MonadPlus Parser where
   mzero = empty
