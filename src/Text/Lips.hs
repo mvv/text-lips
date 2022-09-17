@@ -210,6 +210,12 @@ parseText t p = case startParser p of
                   ParserCont c _ → starveParser (c t)
                   ParserDone r   → r
 
+
+failParser:: String → Parser α 
+failParser msg = Parser $ \_ _ h _ ctx pl nl →
+                   h (Error nl ctx msg) ctx pl nl
+{-# INLINE failParser #-}
+
 instance Functor Parser where
   fmap f (Parser p) = Parser $ \c cc → p (c . f) (cc . f)
 
@@ -235,15 +241,13 @@ instance Monad Parser where
     p (\a → runParser (f a) c cc h ch) (\a → runParser (f a) cc cc ch ch) h ch
   {-# INLINE (>>=) #-}
 #if !MIN_VERSION_base(4,13,0)
-  fail msg = Parser $ \_ _ h _ ctx pl nl →
-               h (Error nl ctx msg) ctx pl nl
+  fail = failParser
   {-# INLINE fail #-}
 #endif
 
 #if MIN_VERSION_base(4,9,0)
 instance MonadFail Parser where
-  fail msg = Parser $ \_ _ h _ ctx pl nl →
-               h (Error nl ctx msg) ctx pl nl
+  fail = failParser
   {-# INLINE fail #-}
 #endif
 
@@ -278,7 +282,7 @@ instance Parsing Parser where
                              (\_ → runParser (skipMany p) cc cc ch ch)
                              h ch
   {-# INLINE skipSome #-}
-  unexpected = fail . ("Unexpected " ++)
+  unexpected = failParser . ("Unexpected " ++)
   {-# INLINE unexpected #-}
   notFollowedBy (Parser p) = Parser $ \c _ h _ ctx pl nl ls is si →
     p (\a _ _ _ _ _ si' → h (Error nl ctx ("Unexpected " ++ show a))
